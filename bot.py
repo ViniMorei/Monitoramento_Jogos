@@ -1,54 +1,55 @@
-# Import for the Web Bot
+import json
+import requests
+from bs4 import BeautifulSoup
+
 from botcity.web import WebBot, Browser, By
-
-# Import for integration with BotCity Maestro SDK
 from botcity.maestro import *
-
-# Disable errors if we are not connected to Maestro
 BotMaestroSDK.RAISE_NOT_CONNECTED = False
+from webdriver_manager.chrome import ChromeDriverManager
+
+from jogos.jogos import lista_jogos as jogos
+from precos.precos import lista_precos as precos
+
+def navegar_precos(bot:WebBot):
+    for jogo in jogos:
+        bot.browse(jogo["link"])
+        bot.wait(2000)
+        extrair_dados(bot)
+
+def extrair_dados(bot:WebBot):
+    # Título
+    # //*[@id="main"]/div/div[1]/div[3]/div[2]/div/div/div/div[1]/div/div/div/h1
+    # preço
+    # //*[@id="main"]/div/div[1]/div[3]/div[2]/div/div/div/div[2]/div/div/div/div/label/div/span[1]/span/span[1]
+    titulo = bot.find_element('//*[@id="main"]/div/div[1]/div[3]/div[2]/div/div/div/div[1]/div/div/div/h1', By.XPATH).text
+    preco = bot.find_element('//*[@id="main"]/div/div[1]/div[3]/div[2]/div/div/div/div[2]/div/div/div/div/label/div/span[1]/span/span[1]', By.XPATH).text
+
+    print(titulo, preco)
+    bot.wait(1000)
 
 
 def main():
-    # Runner passes the server url, the id of the task being executed,
-    # the access token and the parameters that this task receives (when applicable).
     maestro = BotMaestroSDK.from_sys_args()
-    ## Fetch the BotExecution with details from the task, including parameters
     execution = maestro.get_execution()
 
     print(f"Task ID is: {execution.task_id}")
     print(f"Task Parameters are: {execution.parameters}")
 
     bot = WebBot()
-
-    # Configure whether or not to run on headless mode
     bot.headless = False
+    bot.browser = Browser.CHROME
+    bot.driver_path = ChromeDriverManager().install()
 
-    # Uncomment to change the default Browser to Firefox
-    # bot.browser = Browser.FIREFOX
+    
+    try:
+        navegar_precos(bot)
 
-    # Uncomment to set the WebDriver path
-    # bot.driver_path = "<path to your WebDriver binary>"
-
-    # Opens the BotCity website.
-    bot.browse("https://www.botcity.dev")
-
-    # Implement here your logic...
-    ...
-
-    # Wait 3 seconds before closing
-    bot.wait(3000)
-
-    # Finish and clean up the Web Browser
-    # You MUST invoke the stop_browser to avoid
-    # leaving instances of the webdriver open
-    bot.stop_browser()
-
-    # Uncomment to mark this task as finished on BotMaestro
-    # maestro.finish_task(
-    #     task_id=execution.task_id,
-    #     status=AutomationTaskFinishStatus.SUCCESS,
-    #     message="Task Finished OK."
-    # )
+    except Exception as ex:
+        print(ex)
+    
+    finally:
+        bot.wait(1000)
+        bot.stop_browser()
 
 
 def not_found(label):
