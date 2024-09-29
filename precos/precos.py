@@ -11,6 +11,6 @@ def precos_historicos():
     for caminho in caminhos:
         with open(caminho, 'r') as arquivo:
             dado = json.load(arquivo)
-            dados.append(dado)
+            dados.extend(dado)
 
     return dados
