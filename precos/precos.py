@@ -1,4 +1,4 @@
-dict_precos = {
+lista_precos = [
     {   # //*[@id="UjZIQgueFImpGvgzK5a8Kr2iz9kmAi4T"]
         "nome":"Dark Souls III",
         "link":"https://psprices.com/region-br/game/147847/dark-soulstm-iii"
@@ -19,4 +19,4 @@ dict_precos = {
         "nome":"The Last of Us Part II Deluxe Edition",
         "link":"https://psprices.com/region-br/game/3230147/the-last-of-us-part-ii-digital-deluxe-edition"
     },
-}
+]

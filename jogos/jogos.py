@@ -1,4 +1,4 @@
-dict_jogos = {
+lista_jogos = [
     {
         "nome":"Dark Souls III",
         "link":"https://store.playstation.com/pt-br/product/UP0700-CUSA03388_00-DARKSOULS3000000"
@@ -19,4 +19,4 @@ dict_jogos = {
         "nome":"The Last of Us Part II Deluxe Edition",
         "link":"https://store.playstation.com/pt-br/product/UP9000-CUSA07820_00-THELASTOFUSP2DLX"
     },
-}
+]
