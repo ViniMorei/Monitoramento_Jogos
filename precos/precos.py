@@ -1,9 +1,9 @@
 import json
 
 caminhos = [
-    r'precos\DARKSOULSIII.json',
-    r'precos\HORIZON.json',
-    r'precos\RE4.json'
+    r'precos\json\DARKSOULSIII.json',
+    r'precos\json\HORIZON.json',
+    r'precos\json\RE4.json'
 ]
 
 def precos_historicos():
