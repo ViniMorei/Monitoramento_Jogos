@@ -1,15 +1,17 @@
-import json
-import requests
-from bs4 import BeautifulSoup
+import os
 
 from botcity.web import WebBot, Browser, By
 from botcity.maestro import *
 BotMaestroSDK.RAISE_NOT_CONNECTED = False
 from webdriver_manager.chrome import ChromeDriverManager
+import pandas as pd
+import openpyxl
 
 from jogos.jogos import lista_jogos as jogos
 from precos.precos import precos_historicos
 
+
+# WebScraping
 def navegar_precos(bot:WebBot):
     for jogo in jogos:
         bot.browse(jogo["link"])
@@ -28,20 +30,30 @@ def extrair_dados(bot:WebBot):
     bot.wait(1000)
 
 
-def navegar_json():
+# Manipulação de dados
+def criar_planilha(nomeArquivo):
+    if not os.path.exists(nomeArquivo):
+        colunas = ['Jogo', 'Valor', 'Data']
+        df = pd.DataFrame(columns=colunas)
+        df.to_excel(nomeArquivo, index =False, engine='openpyxl')
+       
+        print(f'Arquivo {nomeArquivo} criado!')
+    else:
+        print('Arquivo já existe')
+
+
+def navegar_json(nomeArquivo):
     dados = precos_historicos()
     
-    dadosre4 = dados[2]
-    dadostratados = tratar_dados(dadosre4)
-    print(dadostratados)
-
-    # for precos in dados:
-    #     print(precos["name"])
+    for dado in dados:
+        nome = dado["name"]
+        dados_tratados = tratar_dados(dado)
+        popular_planilha(nome, dados_tratados, nomeArquivo)
 
 
-def tratar_dados(dummy):
+def tratar_dados(json):
     dados = []
-    for precos in dummy["data"]:
+    for precos in json["data"]:
         valor = precos["y"]
         dia = precos["x"]["d"]
         mes = precos["x"]["m"]
@@ -51,6 +63,22 @@ def tratar_dados(dummy):
         dados.append({"Valor" : valor, "Data" : data})
 
     return dados
+
+
+def popular_planilha(jogo:str,dados:list, caminho:str):
+    planilha = pd.read_excel(caminho, engine='openpyxl')
+
+    for dado in dados:
+        nova_linha = pd.DataFrame([{
+            "Jogo" : jogo,
+            "Valor" : dado["Valor"],
+            "Data" : dado["Data"]
+         }])
+        
+        planilha = pd.concat([planilha, nova_linha], ignore_index=True)
+
+    planilha.to_excel(caminho, index=False, engine='openpyxl')
+    print(f"Dados do jogo {jogo} salvos no arquivo {caminho}")
 
 
 def main():
@@ -64,9 +92,9 @@ def main():
     bot.headless = False
     bot.browser = Browser.CHROME
     bot.driver_path = ChromeDriverManager().install()
-
     
     try:
+        criar_planilha('planilha\planilha.xlsx')
         navegar_json()
 
     except Exception as ex:
