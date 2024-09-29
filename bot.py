@@ -27,11 +27,31 @@ def extrair_dados(bot:WebBot):
     print(titulo, preco)
     bot.wait(1000)
 
+
 def navegar_json():
     dados = precos_historicos()
     
-    for precos in dados:
-        print(precos["name"])
+    dadosre4 = dados[2]
+    dadostratados = tratar_dados(dadosre4)
+    print(dadostratados)
+
+    # for precos in dados:
+    #     print(precos["name"])
+
+
+def tratar_dados(dummy):
+    dados = []
+    for precos in dummy["data"]:
+        valor = precos["y"]
+        dia = precos["x"]["d"]
+        mes = precos["x"]["m"]
+        ano = precos["x"]["y"]
+        data = f'{dia}/{mes}/{ano}'
+
+        dados.append({"Valor" : valor, "Data" : data})
+
+    return dados
+
 
 def main():
     maestro = BotMaestroSDK.from_sys_args()
