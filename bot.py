@@ -8,7 +8,7 @@ BotMaestroSDK.RAISE_NOT_CONNECTED = False
 from webdriver_manager.chrome import ChromeDriverManager
 
 from jogos.jogos import lista_jogos as jogos
-from precos.precos import lista_precos as precos
+# from precos.precos import lista_precos as precos
 
 def navegar_precos(bot:WebBot):
     for jogo in jogos:
@@ -27,6 +27,12 @@ def extrair_dados(bot:WebBot):
     print(titulo, preco)
     bot.wait(1000)
 
+from precos.precos import precos_historicos
+def navegar_json():
+    caminho = "precos/DARKSOULSIII.json"
+    with open(caminho, 'r') as arquivo:
+        dados = json.load(arquivo)
+    print(dados)
 
 def main():
     maestro = BotMaestroSDK.from_sys_args()
@@ -42,7 +48,8 @@ def main():
 
     
     try:
-        navegar_precos(bot)
+        precos = precos_historicos()
+        print(precos)
 
     except Exception as ex:
         print(ex)
