@@ -6,7 +6,7 @@ from botcity.maestro import *
 BotMaestroSDK.RAISE_NOT_CONNECTED = False
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
-import openpyxl
+import matplotlib.pyplot as plt
 
 from jogos.jogos import lista_jogos as jogos
 from precos.precos import precos_historicos
@@ -111,6 +111,33 @@ def inserir_dados_extraidos(caminho:str, dados_extraidos:list):
     planilha.to_excel(caminho, index=False, engine='openpyxl')
     print(f'Dados extraídos salvos no arquivo {caminho}')
 
+
+def criarGrafico(df: pd.DataFrame):
+    # Recupera os valores únicos na coluna "PRODUTO" do DataFrame
+    jogos = df["Jogo"].unique()
+    
+    # Itera a lista de produtos únicos e cria
+    # um gráfico de linha para cada produto
+    for jogo in jogos:
+        # Filtra o DataFrame para obter apenas as linhas
+        # onde o produto é igual ao produto da iteração
+        dadosJogo = df[df['Jogo'] == jogo]
+    
+        # Plota e configura o gráfico de variação do preço
+        plt.figure(figsize=(8, 5))
+        plt.plot(dadosJogo['Data'], dadosJogo['Valor'], marker='o')
+        plt.plot()
+
+        plt.title(f'Variação de Preço: {jogo}', fontsize=10)
+        plt.xlabel('Data')
+        plt.ylabel('Preço (R$)')
+        plt.xticks(rotation=45)
+        
+        # Mostra o gráfico
+        plt.tight_layout()
+        plt.show()
+
+
 def main():
     maestro = BotMaestroSDK.from_sys_args()
     execution = maestro.get_execution()
@@ -124,9 +151,12 @@ def main():
     bot.driver_path = ChromeDriverManager().install()
     
     try:
+        nomeArquivo = 'planilha\planilha.xlsx'
         dados_extraidos = navegar_precos(bot)
-        criar_planilha('planilha\planilha.xlsx')
-        inserir_dados('planilha\planilha.xlsx', dados_extraidos)
+        criar_planilha(nomeArquivo)
+        inserir_dados(nomeArquivo, dados_extraidos)
+        df = pd.read_excel(nomeArquivo, engine='openpyxl')
+        criarGrafico(df)
 
     except Exception as ex:
         print(ex)
