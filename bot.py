@@ -59,7 +59,7 @@ def inserir_dados(nomeArquivo:str, dados_extraidos:list):
     dados = precos_historicos()
     
     for dado in dados:
-        nome = dado["name"]
+        nome = str(dado["name"]).replace('â„¢','™')
         dados_tratados = tratar_dados(dado)
         popular_planilha(nome, dados_tratados, nomeArquivo)
 
@@ -71,7 +71,7 @@ def tratar_dados(json):
     for precos in json["data"]:
         valor = precos["y"]
         dia = precos["x"]["d"]
-        mes = precos["x"]["m"]
+        mes = precos["x"]["m"] + 1
         ano = precos["x"]["y"]
         data = f'{dia}/{mes}/{ano}'
 
